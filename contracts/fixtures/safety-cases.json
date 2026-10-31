@@ -1,0 +1,626 @@
+[
+  {
+    "id": "A01-valid-spend",
+    "stream": "procurement",
+    "action": "authorize_spend",
+    "given": {},
+    "expected": {
+      "code": "SPEND_AUTHORIZED",
+      "signatures": 1,
+      "executions": 0
+    }
+  },
+  {
+    "id": "A02-over-purchase-cap",
+    "stream": "procurement",
+    "action": "authorize_spend",
+    "given": {
+      "per_purchase_limit": "3"
+    },
+    "expected": {
+      "code": "OVER_BUDGET",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "A03-cumulative-reservations",
+    "stream": "procurement",
+    "action": "authorize_spend",
+    "given": {
+      "reserved": "8",
+      "total_limit": "10"
+    },
+    "expected": {
+      "code": "OVER_BUDGET",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "A04-expired-mandate",
+    "stream": "procurement",
+    "action": "authorize_spend",
+    "given": {
+      "now": "2026-11-14T12:00:00Z"
+    },
+    "expected": {
+      "code": "MANDATE_EXPIRED",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "A05-provider-not-allowed",
+    "stream": "procurement",
+    "action": "authorize_spend",
+    "given": {
+      "provider_allowlist": [
+        "provider-b"
+      ]
+    },
+    "expected": {
+      "code": "PROVIDER_NOT_ALLOWED",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "A06-agent-cannot-approve",
+    "stream": "procurement",
+    "action": "approve_mandate",
+    "given": {
+      "principal_role": "agent"
+    },
+    "expected": {
+      "code": "FORBIDDEN",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "A07-wrong-asset",
+    "stream": "procurement",
+    "action": "authorize_spend",
+    "given": {
+      "budget_asset": "different-configured-asset"
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "A08-request-budget-across-mandates",
+    "stream": "procurement",
+    "action": "authorize_spend",
+    "given": {
+      "request_spent": "18",
+      "request_reserved": "0",
+      "request_budget": "20"
+    },
+    "expected": {
+      "code": "OVER_BUDGET",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "A09-fee-cap",
+    "stream": "procurement",
+    "action": "authorize_spend",
+    "given": {
+      "fee_drops": "101"
+    },
+    "expected": {
+      "code": "OVER_BUDGET",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "A10-unverified-config",
+    "stream": "procurement",
+    "action": "authorize_spend",
+    "given": {
+      "configuration_verified": false
+    },
+    "expected": {
+      "code": "ASSET_NOT_CONFIGURED",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "A11-unknown-submission-reconcile",
+    "stream": "procurement",
+    "action": "retry_payment",
+    "given": {
+      "existing_transaction": "unknown"
+    },
+    "expected": {
+      "code": "PAYMENT_UNVALIDATED",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "A12-concurrent-spend",
+    "stream": "procurement",
+    "action": "concurrent_spend",
+    "given": {
+      "calls": 2
+    },
+    "expected": {
+      "code": "SPEND_AUTHORIZED",
+      "signatures": 1,
+      "executions": 0,
+      "payments_submitted": 1
+    }
+  },
+  {
+    "id": "B01-valid-ledger",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {},
+    "expected": {
+      "code": "COMPLETED",
+      "signatures": 0,
+      "executions": 1
+    }
+  },
+  {
+    "id": "B02-unvalidated",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "validated": false
+    },
+    "expected": {
+      "code": "PAYMENT_UNVALIDATED",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B03-ledger-failure",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "transaction_result": "tecPATH_DRY"
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B04-wrong-network",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "ledger_network": "mainnet"
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B05-wrong-destination",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "destination": "different-configured-account"
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B06-wrong-payer",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "payer": "different-configured-account"
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B07-delivered-shortfall",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "delivered_value": "0.000001",
+      "transaction_amount": "3.500000"
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B08-unavailable-delivered",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "delivered_amount": "unavailable"
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B09-missing-delivered",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "omit_delivered_amount": true
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B10-wrong-currency",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "delivered_asset": "different-configured-asset"
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B11-wrong-issuer",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "quote_asset": "issued-test-asset",
+      "delivered_issuer": "different-test-issuer"
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B12-partial-flag",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "partial_payment": true
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B13-wrong-memo",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "memo_reference": "quote-other"
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B14-duplicate-memo",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "duplicate_binding_memo": true
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B15-expired-quote",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "now": "2026-11-14T12:00:00Z"
+    },
+    "expected": {
+      "code": "QUOTE_EXPIRED",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B16-policy-revoked",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "rights_allowed": false
+    },
+    "expected": {
+      "code": "RIGHTS_DENIED",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B17-payment-replay",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "tx_claimed_by": "job-other"
+    },
+    "expected": {
+      "code": "PAYMENT_REPLAY",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B18-quote-consumed",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "quote_claimed_by": "job-other"
+    },
+    "expected": {
+      "code": "JOB_ALREADY_EXISTS",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B19-parameters-changed",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "job_bmi_threshold": 35
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B20-rpc-down",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "rpc_available": false
+    },
+    "expected": {
+      "code": "DEPENDENCY_UNAVAILABLE",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B21-fake-caller-proof",
+    "stream": "fulfilment",
+    "action": "submit_job",
+    "given": {
+      "extra_http_fields": {
+        "paid": true,
+        "validated": true
+      }
+    },
+    "expected": {
+      "code": "INVALID_REQUEST",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B22-processor-crash",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "processor_crashes": true
+    },
+    "expected": {
+      "code": "PROCESSING_FAILED",
+      "signatures": 0,
+      "executions": 1,
+      "status": "FAILED",
+      "result_available": false
+    }
+  },
+  {
+    "id": "B23-identical-retry",
+    "stream": "fulfilment",
+    "action": "repeat_job",
+    "given": {
+      "calls": 2,
+      "same_key": true,
+      "same_payload": true
+    },
+    "expected": {
+      "code": "COMPLETED",
+      "signatures": 0,
+      "executions": 1,
+      "jobs_created": 1,
+      "responses_identical": true
+    }
+  },
+  {
+    "id": "B24-key-conflict",
+    "stream": "fulfilment",
+    "action": "repeat_job",
+    "given": {
+      "calls": 2,
+      "same_key": true,
+      "same_payload": false
+    },
+    "expected": {
+      "code": "IDEMPOTENCY_CONFLICT",
+      "signatures": 0,
+      "executions": 1,
+      "jobs_created": 1
+    }
+  },
+  {
+    "id": "B25-concurrent-replay",
+    "stream": "fulfilment",
+    "action": "concurrent_jobs",
+    "given": {
+      "calls": 2,
+      "different_job_and_quote": true,
+      "same_transaction": true
+    },
+    "expected": {
+      "code": "PAYMENT_REPLAY",
+      "signatures": 0,
+      "executions": 1,
+      "jobs_created": 1
+    }
+  },
+  {
+    "id": "B26-independent-fetch",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "procurement_claims_valid": true,
+      "validated": false
+    },
+    "expected": {
+      "code": "PAYMENT_UNVALIDATED",
+      "signatures": 0,
+      "executions": 0,
+      "ledger_fetches": 1
+    }
+  },
+  {
+    "id": "B27-new-key-same-job",
+    "stream": "fulfilment",
+    "action": "repeat_job",
+    "given": {
+      "calls": 2,
+      "same_key": false,
+      "same_payload": true
+    },
+    "expected": {
+      "code": "COMPLETED",
+      "signatures": 0,
+      "executions": 1,
+      "jobs_created": 1,
+      "responses_identical": true
+    }
+  },
+  {
+    "id": "B28-non-payment",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "transaction_type": "AccountSet"
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B29-cross-currency",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "has_sendmax": true,
+      "has_paths": true
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B30-wrong-hash",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "returned_hash": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B31-old-payment",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "ledger_close_time": "2026-11-14T10:59:59Z"
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B32-other-owner",
+    "stream": "fulfilment",
+    "action": "submit_job",
+    "given": {
+      "principal": "other-owner"
+    },
+    "expected": {
+      "code": "FORBIDDEN",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B33-missing-idempotency-key",
+    "stream": "fulfilment",
+    "action": "submit_job",
+    "given": {
+      "omit_idempotency_key": true
+    },
+    "expected": {
+      "code": "INVALID_REQUEST",
+      "signatures": 0,
+      "executions": 0
+    }
+  },
+  {
+    "id": "B34-changed-terms",
+    "stream": "fulfilment",
+    "action": "verify_and_execute",
+    "given": {
+      "tampered_terms_hash": true
+    },
+    "expected": {
+      "code": "PAYMENT_MISMATCH",
+      "signatures": 0,
+      "executions": 0
+    }
+  }
+]

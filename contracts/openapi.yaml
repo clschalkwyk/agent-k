@@ -1,0 +1,1945 @@
+openapi: 3.1.0
+jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
+info:
+  title: Agent K shared HTTP contract
+  version: 0.1.0
+  description: 'Procurement (A) and Fulfilment (B), separate stores and independent
+    trust boundaries. Normative semantics: docs/API-CONTRACT.md. Synthetic data, XRPL
+    Testnet only. No configured asset, funded wallet or deployed service is asserted
+    by this document.'
+tags:
+- name: Procurement
+  description: 'Developer A: requests, planning, mandates and signing controls.'
+- name: Fulfilment
+  description: 'Developer B: catalogue, rights, quotes, independent payment verification
+    and execution.'
+security:
+- BearerAuth: []
+paths:
+  /v1/research-requests:
+    post:
+      operationId: createResearchRequest
+      tags:
+      - Procurement
+      summary: Persist a synthetic research request in DRAFT
+      description: Persist a synthetic research request in DRAFT.
+      x-owner: Procurement
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Success
+          headers:
+            X-Correlation-ID:
+              schema:
+                $ref: '#/components/schemas/Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchRequest'
+              example:
+                request_id: req-001
+                question: Compare synthetic VCAM-1 by BMI group
+                population: Synthetic adult cohort
+                variables:
+                - bmi
+                - vcam1
+                purpose: academic_research
+                operation: aggregate_analysis
+                parameters:
+                  obese_bmi_threshold: 30
+                  biomarker: vcam1
+                  method: mann_whitney_u_two_sided
+                max_budget:
+                  currency: XRP
+                  value: '20.000000'
+                status: DRAFT
+                created_at: '2026-11-14T11:00:00Z'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '409':
+          $ref: '#/components/responses/Error409'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '500':
+          $ref: '#/components/responses/Error500'
+        '503':
+          $ref: '#/components/responses/Error503'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResearchRequestCreate'
+            example:
+              request_id: req-001
+              question: Compare synthetic VCAM-1 by BMI group
+              population: Synthetic adult cohort
+              variables:
+              - bmi
+              - vcam1
+              purpose: academic_research
+              operation: aggregate_analysis
+              parameters:
+                obese_bmi_threshold: 30
+                biomarker: vcam1
+                method: mann_whitney_u_two_sided
+              max_budget:
+                currency: XRP
+                value: '20.000000'
+  /v1/plans:
+    post:
+      operationId: createPlan
+      tags:
+      - Procurement
+      summary: Plan from the stored request; recommendations do not authorise spending
+      description: Plan from the stored request; recommendations do not authorise
+        spending.
+      x-owner: Procurement
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Success
+          headers:
+            X-Correlation-ID:
+              schema:
+                $ref: '#/components/schemas/Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+              example:
+                plan_id: plan-001
+                request_id: req-001
+                candidate_offer_ids:
+                - offer-001
+                - offer-002
+                - offer-003
+                recommended_offer_id: offer-001
+                reason: Variables covered and academic use permitted
+                created_at: '2026-11-14T11:00:00Z'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '409':
+          $ref: '#/components/responses/Error409'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '500':
+          $ref: '#/components/responses/Error500'
+        '503':
+          $ref: '#/components/responses/Error503'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanCreate'
+            example:
+              request_id: req-001
+  /v1/mandates:
+    post:
+      operationId: approveMandate
+      tags:
+      - Procurement
+      summary: Human approves bounded, quote-specific spending
+      description: Human approves bounded, quote-specific spending. Reject agent credentials;
+        validate caps, provider, asset and expiry before persisting.
+      x-owner: Procurement
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Success
+          headers:
+            X-Correlation-ID:
+              schema:
+                $ref: '#/components/schemas/Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mandate'
+              example:
+                request_id: req-001
+                quote_id: quote-001
+                provider_allowlist:
+                - provider-a
+                per_purchase_limit:
+                  currency: XRP
+                  value: '5'
+                total_limit:
+                  currency: XRP
+                  value: '10'
+                max_network_fee_drops: '100'
+                expires_at: '2026-11-14T12:00:00Z'
+                mandate_id: mandate-001
+                approved_by: human-001
+                approved_at: '2026-11-14T11:00:00Z'
+                status: APPROVED
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '409':
+          $ref: '#/components/responses/Error409'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '500':
+          $ref: '#/components/responses/Error500'
+        '503':
+          $ref: '#/components/responses/Error503'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MandateCreate'
+            example:
+              request_id: req-001
+              quote_id: quote-001
+              provider_allowlist:
+              - provider-a
+              per_purchase_limit:
+                currency: XRP
+                value: '5'
+              total_limit:
+                currency: XRP
+                value: '10'
+              max_network_fee_drops: '100'
+              expires_at: '2026-11-14T12:00:00Z'
+  /v1/offerings:
+    get:
+      operationId: listOfferings
+      tags:
+      - Fulfilment
+      summary: Discover synthetic offerings; rights evaluated separately
+      description: Discover synthetic offerings; rights evaluated separately.
+      x-owner: Fulfilment
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: variable
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Variable'
+      - name: purpose
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Purpose'
+      responses:
+        '200':
+          description: Success
+          headers:
+            X-Correlation-ID:
+              schema:
+                $ref: '#/components/schemas/Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfferingList'
+              example:
+                items:
+                - offer_id: offer-001
+                  provider_id: provider-a
+                  dataset_id: synthetic-cohort-a
+                  dataset_version: v1
+                  dataset_hash: a1d8b18f60af4400d01d1ff52e6d73dd92ad584b800c06c3ba92791b416b172a
+                  variable_coverage:
+                  - bmi
+                  - vcam1
+                  sample_size: 4
+                  usage_policy_version: policy-1
+                  supported_operations:
+                  - aggregate_analysis
+                  rights:
+                    policy_version: policy-1
+                    allowed_purposes:
+                    - academic_research
+                    allowed_operations:
+                    - aggregate_analysis
+                    access_mode: aggregate_only
+                    redistribution_allowed: false
+                    synthetic_only: true
+                  indicative_price:
+                    currency: XRP
+                    value: '3.500000'
+                  synthetic: true
+                - offer_id: offer-002
+                  provider_id: provider-b
+                  dataset_id: synthetic-cohort-a
+                  dataset_version: v1
+                  dataset_hash: a1d8b18f60af4400d01d1ff52e6d73dd92ad584b800c06c3ba92791b416b172a
+                  variable_coverage:
+                  - bmi
+                  - vcam1
+                  sample_size: 4
+                  usage_policy_version: policy-1
+                  supported_operations:
+                  - aggregate_analysis
+                  rights:
+                    policy_version: policy-1
+                    allowed_purposes:
+                    - academic_research
+                    allowed_operations:
+                    - aggregate_analysis
+                    access_mode: aggregate_only
+                    redistribution_allowed: false
+                    synthetic_only: true
+                  indicative_price:
+                    currency: XRP
+                    value: '4.500000'
+                  synthetic: true
+                - offer_id: offer-003
+                  provider_id: provider-c
+                  dataset_id: synthetic-cohort-a
+                  dataset_version: v1
+                  dataset_hash: a1d8b18f60af4400d01d1ff52e6d73dd92ad584b800c06c3ba92791b416b172a
+                  variable_coverage:
+                  - bmi
+                  - vcam1
+                  sample_size: 4
+                  usage_policy_version: policy-1
+                  supported_operations:
+                  - aggregate_analysis
+                  rights:
+                    policy_version: policy-1
+                    allowed_purposes:
+                    - commercial_research
+                    allowed_operations:
+                    - aggregate_analysis
+                    access_mode: aggregate_only
+                    redistribution_allowed: false
+                    synthetic_only: true
+                  indicative_price:
+                    currency: XRP
+                    value: '5.500000'
+                  synthetic: true
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '409':
+          $ref: '#/components/responses/Error409'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '500':
+          $ref: '#/components/responses/Error500'
+        '503':
+          $ref: '#/components/responses/Error503'
+  /v1/rights/evaluate:
+    post:
+      operationId: evaluateRights
+      tags:
+      - Fulfilment
+      summary: Evaluate B-owned policy; denial is a 200 decision with allowed=false,
+        not transport failure
+      description: Evaluate B-owned policy; denial is a 200 decision with allowed=false,
+        not transport failure.
+      x-owner: Fulfilment
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Success
+          headers:
+            X-Correlation-ID:
+              schema:
+                $ref: '#/components/schemas/Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RightsDecision'
+              example:
+                decision_id: rights-001
+                request_id: req-001
+                offer_id: offer-001
+                policy_version: policy-1
+                purpose: academic_research
+                operation: aggregate_analysis
+                allowed: true
+                code: RIGHTS_ALLOWED
+                reason: Synthetic aggregate research permitted
+                evaluated_at: '2026-11-14T11:00:00Z'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '409':
+          $ref: '#/components/responses/Error409'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '500':
+          $ref: '#/components/responses/Error500'
+        '503':
+          $ref: '#/components/responses/Error503'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RightsEvaluationRequest'
+            example:
+              request_id: req-001
+              purpose: academic_research
+              operation: aggregate_analysis
+              variables:
+              - bmi
+              - vcam1
+              offer_id: offer-001
+  /v1/quotes:
+    post:
+      operationId: createQuote
+      tags:
+      - Fulfilment
+      summary: Re-evaluate rights and issue immutable quote; deny with 403
+      description: Re-evaluate rights and issue immutable quote; deny with 403. Fail
+        503 if payment configuration is unverified.
+      x-owner: Fulfilment
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Success
+          headers:
+            X-Correlation-ID:
+              schema:
+                $ref: '#/components/schemas/Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+              example:
+                request_id: req-001
+                purpose: academic_research
+                operation: aggregate_analysis
+                variables:
+                - bmi
+                - vcam1
+                offer_id: offer-001
+                parameters:
+                  obese_bmi_threshold: 30
+                  biomarker: vcam1
+                  method: mann_whitney_u_two_sided
+                payer: rrrrrrrrrrrrrrrrrrrrrhoLvTp
+                quote_id: quote-001
+                provider_id: provider-a
+                dataset_id: synthetic-cohort-a
+                dataset_version: v1
+                dataset_hash: a1d8b18f60af4400d01d1ff52e6d73dd92ad584b800c06c3ba92791b416b172a
+                rights_decision:
+                  decision_id: rights-001
+                  request_id: req-001
+                  offer_id: offer-001
+                  policy_version: policy-1
+                  purpose: academic_research
+                  operation: aggregate_analysis
+                  allowed: true
+                  code: RIGHTS_ALLOWED
+                  reason: Synthetic aggregate research permitted
+                  evaluated_at: '2026-11-14T11:00:00Z'
+                price:
+                  currency: XRP
+                  value: '3.500000'
+                destination: rrrrrrrrrrrrrrrrrrrrBZbvji
+                network: testnet
+                reference: quote-001
+                terms_hash: 010783fc637947da5ab56fb33f74675f109c990507a09cc5ac6a17ee9a772f63
+                created_at: '2026-11-14T11:00:00Z'
+                expires_at: '2026-11-14T12:00:00Z'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '409':
+          $ref: '#/components/responses/Error409'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '500':
+          $ref: '#/components/responses/Error500'
+        '503':
+          $ref: '#/components/responses/Error503'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuoteCreate'
+            example:
+              request_id: req-001
+              purpose: academic_research
+              operation: aggregate_analysis
+              variables:
+              - bmi
+              - vcam1
+              offer_id: offer-001
+              parameters:
+                obese_bmi_threshold: 30
+                biomarker: vcam1
+                method: mann_whitney_u_two_sided
+              payer: rrrrrrrrrrrrrrrrrrrrrhoLvTp
+  /v1/jobs:
+    post:
+      operationId: createJob
+      tags:
+      - Fulfilment
+      summary: Persist intake and start independent verification
+      description: Persist intake and start independent verification. 202 means RECEIVED,
+        never payment approval. Async rejection appears in Job.error; no execution
+        until AUTHORISED checks succeed.
+      x-owner: Fulfilment
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: Success
+          headers:
+            X-Correlation-ID:
+              schema:
+                $ref: '#/components/schemas/Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+              example:
+                job_id: job-001
+                request_id: req-001
+                quote_id: quote-001
+                status: RECEIVED
+                created_at: '2026-11-14T11:00:00Z'
+                updated_at: '2026-11-14T11:00:00Z'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '409':
+          $ref: '#/components/responses/Error409'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '500':
+          $ref: '#/components/responses/Error500'
+        '503':
+          $ref: '#/components/responses/Error503'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobCreate'
+            example:
+              job_id: job-001
+              request_id: req-001
+              quote_id: quote-001
+              offer_id: offer-001
+              purpose: academic_research
+              operation: aggregate_analysis
+              parameters:
+                obese_bmi_threshold: 30
+                biomarker: vcam1
+                method: mann_whitney_u_two_sided
+              payment_reference:
+                network: testnet
+                xrpl_tx_hash: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  /v1/jobs/{job_id}:
+    get:
+      operationId: getJob
+      tags:
+      - Fulfilment
+      summary: Read authorised job state, including explicit failures
+      description: Read authorised job state, including explicit failures.
+      x-owner: Fulfilment
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      responses:
+        '200':
+          description: Success
+          headers:
+            X-Correlation-ID:
+              schema:
+                $ref: '#/components/schemas/Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+              example:
+                job_id: job-001
+                request_id: req-001
+                quote_id: quote-001
+                status: RECEIVED
+                created_at: '2026-11-14T11:00:00Z'
+                updated_at: '2026-11-14T11:00:00Z'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '409':
+          $ref: '#/components/responses/Error409'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '500':
+          $ref: '#/components/responses/Error500'
+        '503':
+          $ref: '#/components/responses/Error503'
+  /v1/jobs/{job_id}/result:
+    get:
+      operationId: getResult
+      tags:
+      - Fulfilment
+      summary: 'Return completed result and B-produced evidence; 409 RESULT_NOT_READY
+        while pending; 409 PROCESSING_FAILED is not used: failed jobs return 500 PROCESSING_FAILED
+        here'
+      description: Return completed result and B-produced evidence; 409 RESULT_NOT_READY
+        while pending, mapped verification error for rejected jobs, 500 PROCESSING_FAILED
+        for failed execution.
+      x-owner: Fulfilment
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      responses:
+        '200':
+          description: Success
+          headers:
+            X-Correlation-ID:
+              schema:
+                $ref: '#/components/schemas/Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+              example:
+                job_id: job-001
+                synthetic: true
+                network: testnet
+                disclaimer: SYNTHETIC DATA / TESTNET — not medically actionable
+                analysis:
+                  biomarker: vcam1
+                  units: ng/mL
+                  groups:
+                  - group: non_obese
+                    n: 2
+                    median: 15
+                    q1: 12.5
+                    q3: 17.5
+                  - group: obese
+                    n: 2
+                    median: 35
+                    q1: 32.5
+                    q3: 37.5
+                  method: mann_whitney_u_two_sided
+                  statistic: 0
+                  p_value: 0.3333333333333333
+                  excluded_rows: 0
+                provenance:
+                  request_id: req-001
+                  quote_id: quote-001
+                  offer_id: offer-001
+                  provider_id: provider-a
+                  dataset_id: synthetic-cohort-a
+                  dataset_version: v1
+                  dataset_hash: a1d8b18f60af4400d01d1ff52e6d73dd92ad584b800c06c3ba92791b416b172a
+                  code_version: fixture-v1
+                  code_hash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                  output_hash: 769e1cc4406e82077d2749755db3f21868854c0a33a30d5e3da5042ae18dc3ce
+                  terms_hash: 010783fc637947da5ab56fb33f74675f109c990507a09cc5ac6a17ee9a772f63
+                  purpose: academic_research
+                  operation: aggregate_analysis
+                  parameters:
+                    obese_bmi_threshold: 30
+                    biomarker: vcam1
+                    method: mann_whitney_u_two_sided
+                  rights_decision:
+                    decision_id: rights-001
+                    request_id: req-001
+                    offer_id: offer-001
+                    policy_version: policy-1
+                    purpose: academic_research
+                    operation: aggregate_analysis
+                    allowed: true
+                    code: RIGHTS_ALLOWED
+                    reason: Synthetic aggregate research permitted
+                    evaluated_at: '2026-11-14T11:00:00Z'
+                  payment:
+                    payment_reference:
+                      network: testnet
+                      xrpl_tx_hash: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                    ledger_index: 12345
+                    validated_at: '2026-11-14T11:00:00Z'
+                    transaction_result: tesSUCCESS
+                    payer: rrrrrrrrrrrrrrrrrrrrrhoLvTp
+                    destination: rrrrrrrrrrrrrrrrrrrrBZbvji
+                    delivered_amount:
+                      currency: XRP
+                      value: '3.500000'
+                    reference: quote-001
+                  started_at: '2026-11-14T11:00:00Z'
+                  completed_at: '2026-11-14T11:01:00Z'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '409':
+          $ref: '#/components/responses/Error409'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '500':
+          $ref: '#/components/responses/Error500'
+        '503':
+          $ref: '#/components/responses/Error503'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Opaque deployment-configured credential; roles and subject resolved
+        server-side. Human role required for mandates. Service credentials cannot
+        approve spending. Enforce resource ownership on every ID; TLS outside loopback.
+  schemas:
+    Id:
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+    UtcTimestamp:
+      type: string
+      format: date-time
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?Z$
+    Sha256:
+      type: string
+      pattern: ^[a-f0-9]{64}$
+    TransactionHash:
+      type: string
+      pattern: ^[A-F0-9]{64}$
+    ClassicAddress:
+      type: string
+      pattern: ^r[1-9A-HJ-NP-Za-km-z]{24,34}$
+      description: Lexical check only. Runtime MUST validate XRPL Base58Check checksum
+        and reject special/reserved accounts. No address in a fixture is deployment
+        configuration.
+    Purpose:
+      type: string
+      enum:
+      - academic_research
+      - commercial_research
+    Operation:
+      type: string
+      enum:
+      - aggregate_analysis
+    Variable:
+      type: string
+      enum:
+      - bmi
+      - hscrp
+      - vcam1
+    Money:
+      oneOf:
+      - $ref: '#/components/schemas/XrpMoney'
+      - $ref: '#/components/schemas/IssuedMoney'
+      description: Exact positive decimal string; no exponent, sign or floats. Asset
+        identity is currency plus issuer (issuer forbidden for XRP). No FX conversion.
+        XRP values are XRP units; convert exactly to integer drops at signing. Issued
+        assets disabled until configured and verified.
+    XrpMoney:
+      type: object
+      additionalProperties: false
+      properties:
+        currency:
+          const: XRP
+          type: string
+        value:
+          type: string
+          pattern: ^(?!0(?:\.0+)?$)(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,6})?$
+          maxLength: 19
+      required:
+      - currency
+      - value
+    IssuedMoney:
+      type: object
+      additionalProperties: false
+      properties:
+        currency:
+          type: string
+          pattern: ^(?!XRP$)(?!0{40}$)(?:[A-Z0-9]{3}|[A-F0-9]{40})$
+        issuer:
+          $ref: '#/components/schemas/ClassicAddress'
+        value:
+          type: string
+          pattern: ^(?!0(?:\.0+)?$)(?:0|[1-9][0-9]{0,14})(?:\.[0-9]{1,15})?$
+          maxLength: 31
+      required:
+      - currency
+      - issuer
+      - value
+      description: Restricted MVP decimal subset; runtime must reject values exceeding
+        16 significant digits or failing exact XRPL serialization. Currency is the
+        ledger code, not a display ticker. No issuer is assumed available.
+    AnalysisParameters:
+      type: object
+      additionalProperties: false
+      properties:
+        obese_bmi_threshold:
+          type: number
+          minimum: 10
+          maximum: 80
+        biomarker:
+          type: string
+          enum:
+          - hscrp
+          - vcam1
+        method:
+          type: string
+          enum:
+          - mann_whitney_u_two_sided
+      required:
+      - obese_bmi_threshold
+      - biomarker
+      - method
+    ResearchRequestCreate:
+      type: object
+      additionalProperties: false
+      properties:
+        request_id:
+          $ref: '#/components/schemas/Id'
+        question:
+          type: string
+          minLength: 10
+          maxLength: 2000
+        population:
+          type: string
+          minLength: 1
+          maxLength: 500
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variable'
+          minItems: 2
+          maxItems: 3
+          uniqueItems: true
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        operation:
+          $ref: '#/components/schemas/Operation'
+        parameters:
+          $ref: '#/components/schemas/AnalysisParameters'
+        max_budget:
+          $ref: '#/components/schemas/Money'
+      required:
+      - request_id
+      - question
+      - population
+      - variables
+      - purpose
+      - operation
+      - parameters
+      - max_budget
+      description: Synthetic cohorts only. Variables must include bmi and parameters.biomarker;
+        runtime checks cross-field consistency.
+    ResearchStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PLANNED
+      - APPROVED
+      - PAYMENT_PENDING
+      - PAYMENT_VALIDATED
+      - PROCESSING
+      - COMPLETED
+      - REJECTED
+      - PAYMENT_FAILED
+      - PROCESSING_FAILED
+      - EXPIRED
+    ResearchRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        request_id:
+          $ref: '#/components/schemas/Id'
+        question:
+          type: string
+          minLength: 10
+          maxLength: 2000
+        population:
+          type: string
+          minLength: 1
+          maxLength: 500
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variable'
+          minItems: 2
+          maxItems: 3
+          uniqueItems: true
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        operation:
+          $ref: '#/components/schemas/Operation'
+        parameters:
+          $ref: '#/components/schemas/AnalysisParameters'
+        max_budget:
+          $ref: '#/components/schemas/Money'
+        status:
+          $ref: '#/components/schemas/ResearchStatus'
+        created_at:
+          $ref: '#/components/schemas/UtcTimestamp'
+      required:
+      - request_id
+      - question
+      - population
+      - variables
+      - purpose
+      - operation
+      - parameters
+      - max_budget
+      - status
+      - created_at
+    UsageRights:
+      type: object
+      additionalProperties: false
+      properties:
+        policy_version:
+          $ref: '#/components/schemas/Id'
+        allowed_purposes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Purpose'
+          minItems: 1
+          maxItems: 2
+          uniqueItems: true
+        allowed_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Operation'
+          minItems: 1
+          maxItems: 1
+          uniqueItems: true
+        access_mode:
+          type: string
+          enum:
+          - aggregate_only
+        redistribution_allowed:
+          const: false
+          type: boolean
+        synthetic_only:
+          const: true
+          type: boolean
+      required:
+      - policy_version
+      - allowed_purposes
+      - allowed_operations
+      - access_mode
+      - redistribution_allowed
+      - synthetic_only
+    Offering:
+      type: object
+      additionalProperties: false
+      properties:
+        offer_id:
+          $ref: '#/components/schemas/Id'
+        provider_id:
+          $ref: '#/components/schemas/Id'
+        dataset_id:
+          $ref: '#/components/schemas/Id'
+        dataset_version:
+          $ref: '#/components/schemas/Id'
+        dataset_hash:
+          $ref: '#/components/schemas/Sha256'
+        variable_coverage:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variable'
+          minItems: 2
+          maxItems: 3
+          uniqueItems: true
+        sample_size:
+          type: integer
+          minimum: 2
+        usage_policy_version:
+          $ref: '#/components/schemas/Id'
+        supported_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Operation'
+          minItems: 1
+          maxItems: 1
+          uniqueItems: true
+        rights:
+          $ref: '#/components/schemas/UsageRights'
+        indicative_price:
+          $ref: '#/components/schemas/Money'
+        synthetic:
+          const: true
+          type: boolean
+      required:
+      - offer_id
+      - provider_id
+      - dataset_id
+      - dataset_version
+      - dataset_hash
+      - variable_coverage
+      - sample_size
+      - usage_policy_version
+      - supported_operations
+      - rights
+      - indicative_price
+      - synthetic
+      description: B-owned catalogue snapshot. Price is indicative, never a payment
+        instruction. Policy versions must agree.
+    OfferingList:
+      type: object
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Offering'
+          minItems: 0
+          maxItems: 100
+          uniqueItems: true
+      required:
+      - items
+      description: Complete MVP catalogue, maximum 100 offerings; no silent truncation.
+        Purpose filter discovers candidates, not authorisation; denied candidates
+        may be returned.
+    RightsEvaluationRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        request_id:
+          $ref: '#/components/schemas/Id'
+        offer_id:
+          $ref: '#/components/schemas/Id'
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        operation:
+          $ref: '#/components/schemas/Operation'
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variable'
+          minItems: 2
+          maxItems: 3
+          uniqueItems: true
+      required:
+      - request_id
+      - offer_id
+      - purpose
+      - operation
+      - variables
+    RightsDecision:
+      type: object
+      additionalProperties: false
+      properties:
+        decision_id:
+          $ref: '#/components/schemas/Id'
+        request_id:
+          $ref: '#/components/schemas/Id'
+        offer_id:
+          $ref: '#/components/schemas/Id'
+        policy_version:
+          $ref: '#/components/schemas/Id'
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        operation:
+          $ref: '#/components/schemas/Operation'
+        allowed:
+          type: boolean
+        code:
+          type: string
+          enum:
+          - RIGHTS_ALLOWED
+          - RIGHTS_DENIED
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        evaluated_at:
+          $ref: '#/components/schemas/UtcTimestamp'
+      required:
+      - decision_id
+      - request_id
+      - offer_id
+      - policy_version
+      - purpose
+      - operation
+      - allowed
+      - code
+      - reason
+      - evaluated_at
+      allOf:
+      - if:
+          properties:
+            allowed:
+              const: true
+        then:
+          properties:
+            code:
+              const: RIGHTS_ALLOWED
+        else:
+          properties:
+            code:
+              const: RIGHTS_DENIED
+    QuoteCreate:
+      type: object
+      additionalProperties: false
+      properties:
+        request_id:
+          $ref: '#/components/schemas/Id'
+        offer_id:
+          $ref: '#/components/schemas/Id'
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        operation:
+          $ref: '#/components/schemas/Operation'
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variable'
+          minItems: 2
+          maxItems: 3
+          uniqueItems: true
+        parameters:
+          $ref: '#/components/schemas/AnalysisParameters'
+        payer:
+          $ref: '#/components/schemas/ClassicAddress'
+      required:
+      - request_id
+      - offer_id
+      - purpose
+      - operation
+      - variables
+      - parameters
+      - payer
+      description: B evaluates current rights itself. Caller cannot choose quote price,
+        destination, expiry, terms hash or decision. Bind payer to authenticated principal;
+        checksum-validate it.
+    Quote:
+      type: object
+      additionalProperties: false
+      properties:
+        request_id:
+          $ref: '#/components/schemas/Id'
+        offer_id:
+          $ref: '#/components/schemas/Id'
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        operation:
+          $ref: '#/components/schemas/Operation'
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variable'
+          minItems: 2
+          maxItems: 3
+          uniqueItems: true
+        parameters:
+          $ref: '#/components/schemas/AnalysisParameters'
+        payer:
+          $ref: '#/components/schemas/ClassicAddress'
+        quote_id:
+          $ref: '#/components/schemas/Id'
+        provider_id:
+          $ref: '#/components/schemas/Id'
+        dataset_id:
+          $ref: '#/components/schemas/Id'
+        dataset_version:
+          $ref: '#/components/schemas/Id'
+        dataset_hash:
+          $ref: '#/components/schemas/Sha256'
+        rights_decision:
+          $ref: '#/components/schemas/RightsDecision'
+        price:
+          $ref: '#/components/schemas/Money'
+        destination:
+          $ref: '#/components/schemas/ClassicAddress'
+        network:
+          type: string
+          enum:
+          - testnet
+        reference:
+          $ref: '#/components/schemas/Id'
+        terms_hash:
+          $ref: '#/components/schemas/Sha256'
+        created_at:
+          $ref: '#/components/schemas/UtcTimestamp'
+        expires_at:
+          $ref: '#/components/schemas/UtcTimestamp'
+      required:
+      - request_id
+      - offer_id
+      - purpose
+      - operation
+      - variables
+      - parameters
+      - payer
+      - quote_id
+      - provider_id
+      - dataset_id
+      - dataset_version
+      - dataset_hash
+      - rights_decision
+      - price
+      - destination
+      - network
+      - reference
+      - terms_hash
+      - created_at
+      - expires_at
+      description: Immutable B-owned snapshot. reference equals quote_id. Memo binding
+        and canonical terms hash are specified in docs/API-CONTRACT.md. All embedded
+        IDs, purposes and policy versions must agree. Expiry strictly after creation.
+        Only allowed rights produce a quote.
+    PlanCreate:
+      type: object
+      additionalProperties: false
+      properties:
+        request_id:
+          $ref: '#/components/schemas/Id'
+      required:
+      - request_id
+    Plan:
+      type: object
+      additionalProperties: false
+      properties:
+        plan_id:
+          $ref: '#/components/schemas/Id'
+        request_id:
+          $ref: '#/components/schemas/Id'
+        candidate_offer_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/Id'
+          minItems: 1
+          maxItems: 100
+          uniqueItems: true
+        recommended_offer_id:
+          $ref: '#/components/schemas/Id'
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        created_at:
+          $ref: '#/components/schemas/UtcTimestamp'
+      required:
+      - plan_id
+      - request_id
+      - candidate_offer_ids
+      - recommended_offer_id
+      - reason
+      - created_at
+      description: Recommendation only; no approval or payment. Selected offer must
+        belong to candidate list. A rechecks B rights/quote before spending.
+    MandateCreate:
+      type: object
+      additionalProperties: false
+      properties:
+        request_id:
+          $ref: '#/components/schemas/Id'
+        quote_id:
+          $ref: '#/components/schemas/Id'
+        provider_allowlist:
+          type: array
+          items:
+            $ref: '#/components/schemas/Id'
+          minItems: 1
+          maxItems: 100
+          uniqueItems: true
+        per_purchase_limit:
+          $ref: '#/components/schemas/Money'
+        total_limit:
+          $ref: '#/components/schemas/Money'
+        max_network_fee_drops:
+          type: string
+          pattern: ^[1-9][0-9]{0,8}$
+        expires_at:
+          $ref: '#/components/schemas/UtcTimestamp'
+      required:
+      - request_id
+      - quote_id
+      - provider_allowlist
+      - per_purchase_limit
+      - total_limit
+      - max_network_fee_drops
+      - expires_at
+      description: Authenticated HUMAN approval action; agent/service credentials
+        forbidden. A resolves quote from B and binds request, payer, purpose, operation,
+        parameters and asset. No client approved_by/approved/status fields accepted.
+    Mandate:
+      type: object
+      additionalProperties: false
+      properties:
+        request_id:
+          $ref: '#/components/schemas/Id'
+        quote_id:
+          $ref: '#/components/schemas/Id'
+        provider_allowlist:
+          type: array
+          items:
+            $ref: '#/components/schemas/Id'
+          minItems: 1
+          maxItems: 100
+          uniqueItems: true
+        per_purchase_limit:
+          $ref: '#/components/schemas/Money'
+        total_limit:
+          $ref: '#/components/schemas/Money'
+        max_network_fee_drops:
+          type: string
+          pattern: ^[1-9][0-9]{0,8}$
+        expires_at:
+          $ref: '#/components/schemas/UtcTimestamp'
+        mandate_id:
+          $ref: '#/components/schemas/Id'
+        approved_by:
+          $ref: '#/components/schemas/Id'
+        approved_at:
+          $ref: '#/components/schemas/UtcTimestamp'
+        status:
+          type: string
+          enum:
+          - APPROVED
+      required:
+      - request_id
+      - quote_id
+      - provider_allowlist
+      - per_purchase_limit
+      - total_limit
+      - max_network_fee_drops
+      - expires_at
+      - mandate_id
+      - approved_by
+      - approved_at
+      - status
+      description: Approval identity and time derived server-side. Quote-bound, one
+        purchase. Limits are caps, not wallet balances. Fees have a separate XRP drops
+        cap.
+    PaymentReference:
+      type: object
+      additionalProperties: false
+      properties:
+        network:
+          type: string
+          enum:
+          - testnet
+        xrpl_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+      required:
+      - network
+      - xrpl_tx_hash
+      description: UNTRUSTED lookup reference only. B fetches transaction and metadata
+        independently from pinned Testnet RPC. No paid/validated/amount/issuer assertions
+        accepted.
+    JobCreate:
+      type: object
+      additionalProperties: false
+      properties:
+        job_id:
+          $ref: '#/components/schemas/Id'
+        request_id:
+          $ref: '#/components/schemas/Id'
+        quote_id:
+          $ref: '#/components/schemas/Id'
+        offer_id:
+          $ref: '#/components/schemas/Id'
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        operation:
+          $ref: '#/components/schemas/Operation'
+        parameters:
+          $ref: '#/components/schemas/AnalysisParameters'
+        payment_reference:
+          $ref: '#/components/schemas/PaymentReference'
+      required:
+      - job_id
+      - request_id
+      - quote_id
+      - offer_id
+      - purpose
+      - operation
+      - parameters
+      - payment_reference
+      description: B compares every field with its immutable quote and authenticates
+        ownership. Atomic uniqueness on job_id, quote_id and (network, transaction
+        hash). Payment reference is never proof.
+    Error:
+      type: object
+      additionalProperties: false
+      properties:
+        code:
+          type: string
+          enum:
+          - INVALID_REQUEST
+          - UNAUTHENTICATED
+          - FORBIDDEN
+          - NOT_FOUND
+          - RIGHTS_DENIED
+          - QUOTE_EXPIRED
+          - OVER_BUDGET
+          - MANDATE_EXPIRED
+          - PROVIDER_NOT_ALLOWED
+          - ASSET_NOT_CONFIGURED
+          - PAYMENT_UNVALIDATED
+          - PAYMENT_MISMATCH
+          - PAYMENT_REPLAY
+          - JOB_ALREADY_EXISTS
+          - IDEMPOTENCY_CONFLICT
+          - RESULT_NOT_READY
+          - PROCESSING_FAILED
+          - INTERNAL_ERROR
+          - DEPENDENCY_UNAVAILABLE
+        message:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        correlation_id:
+          $ref: '#/components/schemas/Id'
+        retryable:
+          type: boolean
+      required:
+      - code
+      - message
+      - correlation_id
+      - retryable
+    Job:
+      type: object
+      additionalProperties: false
+      properties:
+        job_id:
+          $ref: '#/components/schemas/Id'
+        request_id:
+          $ref: '#/components/schemas/Id'
+        quote_id:
+          $ref: '#/components/schemas/Id'
+        status:
+          type: string
+          enum:
+          - RECEIVED
+          - VERIFYING
+          - AUTHORIZED
+          - RUNNING
+          - COMPLETED
+          - REJECTED
+          - FAILED
+        created_at:
+          $ref: '#/components/schemas/UtcTimestamp'
+        updated_at:
+          $ref: '#/components/schemas/UtcTimestamp'
+        error:
+          $ref: '#/components/schemas/Error'
+        result_path:
+          type: string
+          pattern: ^/v1/jobs/[A-Za-z0-9][A-Za-z0-9._:-]*/result$
+      required:
+      - job_id
+      - request_id
+      - quote_id
+      - status
+      - created_at
+      - updated_at
+      allOf:
+      - if:
+          properties:
+            status:
+              const: COMPLETED
+        then:
+          required:
+          - result_path
+          not:
+            required:
+            - error
+        else:
+          not:
+            required:
+            - result_path
+      - if:
+          properties:
+            status:
+              enum:
+              - REJECTED
+              - FAILED
+        then:
+          required:
+          - error
+        else:
+          not:
+            required:
+            - error
+    GroupSummary:
+      type: object
+      additionalProperties: false
+      properties:
+        group:
+          type: string
+          enum:
+          - non_obese
+          - obese
+        n:
+          type: integer
+          minimum: 1
+        median:
+          type: number
+          minimum: 0
+        q1:
+          type: number
+          minimum: 0
+        q3:
+          type: number
+          minimum: 0
+      required:
+      - group
+      - n
+      - median
+      - q1
+      - q3
+    AnalysisResult:
+      type: object
+      additionalProperties: false
+      properties:
+        biomarker:
+          type: string
+          enum:
+          - hscrp
+          - vcam1
+        units:
+          type: string
+          enum:
+          - mg/L
+          - ng/mL
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupSummary'
+          minItems: 2
+          maxItems: 2
+          uniqueItems: true
+        method:
+          type: string
+          enum:
+          - mann_whitney_u_two_sided
+        statistic:
+          type: number
+          minimum: 0
+        p_value:
+          type: number
+          minimum: 0
+          maximum: 1
+        excluded_rows:
+          type: integer
+          minimum: 0
+      required:
+      - biomarker
+      - units
+      - groups
+      - method
+      - statistic
+      - p_value
+      - excluded_rows
+      description: Both groups exactly once; q1 <= median <= q3; hsCRP mg/L, VCAM-1
+        ng/mL. Runtime checks these relationships. Insufficient data is PROCESSING_FAILED,
+        never NaN or fabricated statistics.
+    PaymentEvidence:
+      type: object
+      additionalProperties: false
+      properties:
+        payment_reference:
+          $ref: '#/components/schemas/PaymentReference'
+        ledger_index:
+          type: integer
+          minimum: 1
+        validated_at:
+          $ref: '#/components/schemas/UtcTimestamp'
+        transaction_result:
+          type: string
+          enum:
+          - tesSUCCESS
+        payer:
+          $ref: '#/components/schemas/ClassicAddress'
+        destination:
+          $ref: '#/components/schemas/ClassicAddress'
+        delivered_amount:
+          $ref: '#/components/schemas/Money'
+        reference:
+          $ref: '#/components/schemas/Id'
+      required:
+      - payment_reference
+      - ledger_index
+      - validated_at
+      - transaction_result
+      - payer
+      - destination
+      - delivered_amount
+      - reference
+      description: B-produced evidence after independent verification; never accepted
+        on a write endpoint.
+    Provenance:
+      type: object
+      additionalProperties: false
+      properties:
+        request_id:
+          $ref: '#/components/schemas/Id'
+        quote_id:
+          $ref: '#/components/schemas/Id'
+        offer_id:
+          $ref: '#/components/schemas/Id'
+        provider_id:
+          $ref: '#/components/schemas/Id'
+        dataset_id:
+          $ref: '#/components/schemas/Id'
+        dataset_version:
+          $ref: '#/components/schemas/Id'
+        dataset_hash:
+          $ref: '#/components/schemas/Sha256'
+        code_version:
+          $ref: '#/components/schemas/Id'
+        code_hash:
+          $ref: '#/components/schemas/Sha256'
+        output_hash:
+          $ref: '#/components/schemas/Sha256'
+        terms_hash:
+          $ref: '#/components/schemas/Sha256'
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        operation:
+          $ref: '#/components/schemas/Operation'
+        parameters:
+          $ref: '#/components/schemas/AnalysisParameters'
+        rights_decision:
+          $ref: '#/components/schemas/RightsDecision'
+        payment:
+          $ref: '#/components/schemas/PaymentEvidence'
+        started_at:
+          $ref: '#/components/schemas/UtcTimestamp'
+        completed_at:
+          $ref: '#/components/schemas/UtcTimestamp'
+      required:
+      - request_id
+      - quote_id
+      - offer_id
+      - provider_id
+      - dataset_id
+      - dataset_version
+      - dataset_hash
+      - code_version
+      - code_hash
+      - output_hash
+      - terms_hash
+      - purpose
+      - operation
+      - parameters
+      - rights_decision
+      - payment
+      - started_at
+      - completed_at
+    Result:
+      type: object
+      additionalProperties: false
+      properties:
+        job_id:
+          $ref: '#/components/schemas/Id'
+        synthetic:
+          const: true
+          type: boolean
+        network:
+          type: string
+          enum:
+          - testnet
+        disclaimer:
+          type: string
+          enum:
+          - SYNTHETIC DATA / TESTNET — not medically actionable
+        analysis:
+          $ref: '#/components/schemas/AnalysisResult'
+        provenance:
+          $ref: '#/components/schemas/Provenance'
+      required:
+      - job_id
+      - synthetic
+      - network
+      - disclaimer
+      - analysis
+      - provenance
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        $ref: '#/components/schemas/Id'
+      description: 'All POSTs: stable key per logical operation; see normative durable
+        retry/expiry rules.'
+    CorrelationId:
+      name: X-Correlation-ID
+      in: header
+      required: false
+      schema:
+        $ref: '#/components/schemas/Id'
+      description: Echo a valid caller value or generate a new opaque ID.
+  responses:
+    Error400:
+      description: INVALID_REQUEST. See Error.retryable; never blindly resubmit payment.
+      headers:
+        X-Correlation-ID:
+          schema:
+            $ref: '#/components/schemas/Id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            properties:
+              code:
+                type: string
+                enum:
+                - INVALID_REQUEST
+          example:
+            code: INVALID_REQUEST
+            message: Synthetic contract error example
+            correlation_id: corr-001
+            retryable: false
+    Error401:
+      description: UNAUTHENTICATED. See Error.retryable; never blindly resubmit payment.
+      headers:
+        X-Correlation-ID:
+          schema:
+            $ref: '#/components/schemas/Id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            properties:
+              code:
+                type: string
+                enum:
+                - UNAUTHENTICATED
+          example:
+            code: UNAUTHENTICATED
+            message: Synthetic contract error example
+            correlation_id: corr-001
+            retryable: false
+    Error403:
+      description: FORBIDDEN, RIGHTS_DENIED, PROVIDER_NOT_ALLOWED. See Error.retryable;
+        never blindly resubmit payment.
+      headers:
+        X-Correlation-ID:
+          schema:
+            $ref: '#/components/schemas/Id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            properties:
+              code:
+                type: string
+                enum:
+                - FORBIDDEN
+                - RIGHTS_DENIED
+                - PROVIDER_NOT_ALLOWED
+          example:
+            code: FORBIDDEN
+            message: Synthetic contract error example
+            correlation_id: corr-001
+            retryable: false
+    Error404:
+      description: NOT_FOUND. See Error.retryable; never blindly resubmit payment.
+      headers:
+        X-Correlation-ID:
+          schema:
+            $ref: '#/components/schemas/Id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            properties:
+              code:
+                type: string
+                enum:
+                - NOT_FOUND
+          example:
+            code: NOT_FOUND
+            message: Synthetic contract error example
+            correlation_id: corr-001
+            retryable: false
+    Error409:
+      description: PAYMENT_UNVALIDATED, PAYMENT_REPLAY, JOB_ALREADY_EXISTS, IDEMPOTENCY_CONFLICT,
+        RESULT_NOT_READY. See Error.retryable; never blindly resubmit payment.
+      headers:
+        X-Correlation-ID:
+          schema:
+            $ref: '#/components/schemas/Id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            properties:
+              code:
+                type: string
+                enum:
+                - PAYMENT_UNVALIDATED
+                - PAYMENT_REPLAY
+                - JOB_ALREADY_EXISTS
+                - IDEMPOTENCY_CONFLICT
+                - RESULT_NOT_READY
+          example:
+            code: PAYMENT_UNVALIDATED
+            message: Synthetic contract error example
+            correlation_id: corr-001
+            retryable: false
+    Error410:
+      description: QUOTE_EXPIRED, MANDATE_EXPIRED. See Error.retryable; never blindly
+        resubmit payment.
+      headers:
+        X-Correlation-ID:
+          schema:
+            $ref: '#/components/schemas/Id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            properties:
+              code:
+                type: string
+                enum:
+                - QUOTE_EXPIRED
+                - MANDATE_EXPIRED
+          example:
+            code: QUOTE_EXPIRED
+            message: Synthetic contract error example
+            correlation_id: corr-001
+            retryable: false
+    Error422:
+      description: INVALID_REQUEST, OVER_BUDGET, PAYMENT_MISMATCH. See Error.retryable;
+        never blindly resubmit payment.
+      headers:
+        X-Correlation-ID:
+          schema:
+            $ref: '#/components/schemas/Id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            properties:
+              code:
+                type: string
+                enum:
+                - INVALID_REQUEST
+                - OVER_BUDGET
+                - PAYMENT_MISMATCH
+          example:
+            code: INVALID_REQUEST
+            message: Synthetic contract error example
+            correlation_id: corr-001
+            retryable: false
+    Error500:
+      description: INTERNAL_ERROR, PROCESSING_FAILED. See Error.retryable; never blindly
+        resubmit payment.
+      headers:
+        X-Correlation-ID:
+          schema:
+            $ref: '#/components/schemas/Id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            properties:
+              code:
+                type: string
+                enum:
+                - INTERNAL_ERROR
+                - PROCESSING_FAILED
+          example:
+            code: INTERNAL_ERROR
+            message: Synthetic contract error example
+            correlation_id: corr-001
+            retryable: false
+    Error503:
+      description: ASSET_NOT_CONFIGURED, DEPENDENCY_UNAVAILABLE. See Error.retryable;
+        never blindly resubmit payment.
+      headers:
+        X-Correlation-ID:
+          schema:
+            $ref: '#/components/schemas/Id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            properties:
+              code:
+                type: string
+                enum:
+                - ASSET_NOT_CONFIGURED
+                - DEPENDENCY_UNAVAILABLE
+          example:
+            code: ASSET_NOT_CONFIGURED
+            message: Synthetic contract error example
+            correlation_id: corr-001
+            retryable: true
