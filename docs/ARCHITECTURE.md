@@ -1,5 +1,8 @@
 # Architecture and bounded contexts
 
+**Implementation diagrams:** [DDD context map](DDD-CONTEXT-MAP.md) · [End-to-end execution sequence](EXECUTION-SEQUENCE.md). These align with the [normative OpenAPI](../contracts/openapi.yaml) and [runtime rules](API-CONTRACT.md).
+
+
 ## Shape
 Two independently deployable modules, **one XRPL ledger**, one versioned HTTP contract.
 
