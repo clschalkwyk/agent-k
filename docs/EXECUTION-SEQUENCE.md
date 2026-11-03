@@ -60,17 +60,23 @@ sequenceDiagram
             B->>B: Check payer, destination, memo, asset, delivered_amount, time, rights
             alt Valid payment and eligible rights
                 B->>BS: Job -> AUTHORIZED
-                B->>W: Execute approved synthetic analysis
                 B->>BS: Job -> RUNNING
-                W-->>B: Statistics, dataset/code/output hashes
-                B->>BS: Save result + provenance; Job -> COMPLETED
-                loop Until terminal job state
+                B->>W: Execute approved synthetic analysis
+                alt Processing succeeds
+                    W-->>B: Statistics, dataset/code/output hashes
+                    B->>BS: Save result + provenance; Job -> COMPLETED
                     A->>B: GET /v1/jobs/{job_id}
-                    B-->>A: 200 Job state
+                    B-->>A: 200 COMPLETED
+                    A->>B: GET /v1/jobs/{job_id}/result
+                    B-->>A: 200 Result + Provenance
+                    A-->>U: Display statistics, payment TX and evidence
+                else Processing fails
+                    W-->>B: Execution error
+                    B->>BS: Job -> FAILED with PROCESSING_FAILED
+                    A->>B: GET /v1/jobs/{job_id}
+                    B-->>A: 200 FAILED + Error
+                    A-->>U: Processing failed; reconciliation required
                 end
-                A->>B: GET /v1/jobs/{job_id}/result
-                B-->>A: 200 Result + Provenance
-                A-->>U: Display statistics, payment TX and evidence
             else B cannot reach trusted XRPL RPC temporarily
                 B->>BS: Stay VERIFYING; retry read; no computation
                 A->>B: GET /v1/jobs/{job_id}
@@ -80,11 +86,6 @@ sequenceDiagram
                 A->>B: GET /v1/jobs/{job_id}
                 B-->>A: 200 REJECTED + Error
                 A-->>U: Show failure; payment may already have settled
-            else B processor fails after authorisation
-                B->>BS: Job -> FAILED with PROCESSING_FAILED
-                A->>B: GET /v1/jobs/{job_id}
-                B-->>A: 200 FAILED + Error
-                A-->>U: Processing failed; reconciliation required
             end
         else Pending or XRPL RPC timed out
             A->>AS: Preserve pending transaction + budget reservation
