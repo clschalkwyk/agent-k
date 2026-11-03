@@ -20,3 +20,7 @@ The demo is a coordinated trusted workflow, not atomic payment-for-delivery or c
 
 ## ADR-007 — Infrastructure deliberately minimal (proposed)
 Python FastAPI services, React/Vite web, SQLite and Docker Compose. No queue, Kubernetes, cross-chain bridge or live patient integrations for the MVP.
+
+## ADR-008 — Shared API 0.1.0 freeze (proposed in contract PR)
+
+OpenAPI 3.1 at `contracts/openapi.yaml` owns wire shapes; `docs/API-CONTRACT.md` owns runtime invariants. Keep all nine draft routes and the A/B boundary. Choose one quote-binding memo format, closed input objects, authenticated human-only mandate creation, quote-bound mandates with cumulative request reservations, independent B verification, globally unique payment/quote claims and durable POST idempotency. Payment evidence is output-only; incoming jobs carry an untrusted hash/network reference. Synthetic XRP fixtures are not wallet configuration or proof of asset readiness. Issued assets remain gated on explicit verification. Merge establishes the stage-0 contract freeze; later breaking changes require joint review/versioning.

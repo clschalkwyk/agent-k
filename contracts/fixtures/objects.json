@@ -1,0 +1,531 @@
+{
+  "ResearchRequestCreate": {
+    "request_id": "req-001",
+    "question": "Compare synthetic VCAM-1 by BMI group",
+    "population": "Synthetic adult cohort",
+    "variables": [
+      "bmi",
+      "vcam1"
+    ],
+    "purpose": "academic_research",
+    "operation": "aggregate_analysis",
+    "parameters": {
+      "obese_bmi_threshold": 30,
+      "biomarker": "vcam1",
+      "method": "mann_whitney_u_two_sided"
+    },
+    "max_budget": {
+      "currency": "XRP",
+      "value": "20.000000"
+    }
+  },
+  "ResearchRequest": {
+    "request_id": "req-001",
+    "question": "Compare synthetic VCAM-1 by BMI group",
+    "population": "Synthetic adult cohort",
+    "variables": [
+      "bmi",
+      "vcam1"
+    ],
+    "purpose": "academic_research",
+    "operation": "aggregate_analysis",
+    "parameters": {
+      "obese_bmi_threshold": 30,
+      "biomarker": "vcam1",
+      "method": "mann_whitney_u_two_sided"
+    },
+    "max_budget": {
+      "currency": "XRP",
+      "value": "20.000000"
+    },
+    "status": "DRAFT",
+    "created_at": "2026-11-14T11:00:00Z"
+  },
+  "UsageRights": {
+    "policy_version": "policy-1",
+    "allowed_purposes": [
+      "academic_research"
+    ],
+    "allowed_operations": [
+      "aggregate_analysis"
+    ],
+    "access_mode": "aggregate_only",
+    "redistribution_allowed": false,
+    "synthetic_only": true
+  },
+  "Offering": {
+    "offer_id": "offer-001",
+    "provider_id": "provider-a",
+    "dataset_id": "synthetic-cohort-a",
+    "dataset_version": "v1",
+    "dataset_hash": "a1d8b18f60af4400d01d1ff52e6d73dd92ad584b800c06c3ba92791b416b172a",
+    "variable_coverage": [
+      "bmi",
+      "vcam1"
+    ],
+    "sample_size": 4,
+    "usage_policy_version": "policy-1",
+    "supported_operations": [
+      "aggregate_analysis"
+    ],
+    "rights": {
+      "policy_version": "policy-1",
+      "allowed_purposes": [
+        "academic_research"
+      ],
+      "allowed_operations": [
+        "aggregate_analysis"
+      ],
+      "access_mode": "aggregate_only",
+      "redistribution_allowed": false,
+      "synthetic_only": true
+    },
+    "indicative_price": {
+      "currency": "XRP",
+      "value": "3.500000"
+    },
+    "synthetic": true
+  },
+  "OfferingList": {
+    "items": [
+      {
+        "offer_id": "offer-001",
+        "provider_id": "provider-a",
+        "dataset_id": "synthetic-cohort-a",
+        "dataset_version": "v1",
+        "dataset_hash": "a1d8b18f60af4400d01d1ff52e6d73dd92ad584b800c06c3ba92791b416b172a",
+        "variable_coverage": [
+          "bmi",
+          "vcam1"
+        ],
+        "sample_size": 4,
+        "usage_policy_version": "policy-1",
+        "supported_operations": [
+          "aggregate_analysis"
+        ],
+        "rights": {
+          "policy_version": "policy-1",
+          "allowed_purposes": [
+            "academic_research"
+          ],
+          "allowed_operations": [
+            "aggregate_analysis"
+          ],
+          "access_mode": "aggregate_only",
+          "redistribution_allowed": false,
+          "synthetic_only": true
+        },
+        "indicative_price": {
+          "currency": "XRP",
+          "value": "3.500000"
+        },
+        "synthetic": true
+      },
+      {
+        "offer_id": "offer-002",
+        "provider_id": "provider-b",
+        "dataset_id": "synthetic-cohort-a",
+        "dataset_version": "v1",
+        "dataset_hash": "a1d8b18f60af4400d01d1ff52e6d73dd92ad584b800c06c3ba92791b416b172a",
+        "variable_coverage": [
+          "bmi",
+          "vcam1"
+        ],
+        "sample_size": 4,
+        "usage_policy_version": "policy-1",
+        "supported_operations": [
+          "aggregate_analysis"
+        ],
+        "rights": {
+          "policy_version": "policy-1",
+          "allowed_purposes": [
+            "academic_research"
+          ],
+          "allowed_operations": [
+            "aggregate_analysis"
+          ],
+          "access_mode": "aggregate_only",
+          "redistribution_allowed": false,
+          "synthetic_only": true
+        },
+        "indicative_price": {
+          "currency": "XRP",
+          "value": "4.500000"
+        },
+        "synthetic": true
+      },
+      {
+        "offer_id": "offer-003",
+        "provider_id": "provider-c",
+        "dataset_id": "synthetic-cohort-a",
+        "dataset_version": "v1",
+        "dataset_hash": "a1d8b18f60af4400d01d1ff52e6d73dd92ad584b800c06c3ba92791b416b172a",
+        "variable_coverage": [
+          "bmi",
+          "vcam1"
+        ],
+        "sample_size": 4,
+        "usage_policy_version": "policy-1",
+        "supported_operations": [
+          "aggregate_analysis"
+        ],
+        "rights": {
+          "policy_version": "policy-1",
+          "allowed_purposes": [
+            "commercial_research"
+          ],
+          "allowed_operations": [
+            "aggregate_analysis"
+          ],
+          "access_mode": "aggregate_only",
+          "redistribution_allowed": false,
+          "synthetic_only": true
+        },
+        "indicative_price": {
+          "currency": "XRP",
+          "value": "5.500000"
+        },
+        "synthetic": true
+      }
+    ]
+  },
+  "RightsEvaluationRequest": {
+    "request_id": "req-001",
+    "purpose": "academic_research",
+    "operation": "aggregate_analysis",
+    "variables": [
+      "bmi",
+      "vcam1"
+    ],
+    "offer_id": "offer-001"
+  },
+  "RightsDecision": {
+    "decision_id": "rights-001",
+    "request_id": "req-001",
+    "offer_id": "offer-001",
+    "policy_version": "policy-1",
+    "purpose": "academic_research",
+    "operation": "aggregate_analysis",
+    "allowed": true,
+    "code": "RIGHTS_ALLOWED",
+    "reason": "Synthetic aggregate research permitted",
+    "evaluated_at": "2026-11-14T11:00:00Z"
+  },
+  "QuoteCreate": {
+    "request_id": "req-001",
+    "purpose": "academic_research",
+    "operation": "aggregate_analysis",
+    "variables": [
+      "bmi",
+      "vcam1"
+    ],
+    "offer_id": "offer-001",
+    "parameters": {
+      "obese_bmi_threshold": 30,
+      "biomarker": "vcam1",
+      "method": "mann_whitney_u_two_sided"
+    },
+    "payer": "rrrrrrrrrrrrrrrrrrrrrhoLvTp"
+  },
+  "Quote": {
+    "request_id": "req-001",
+    "purpose": "academic_research",
+    "operation": "aggregate_analysis",
+    "variables": [
+      "bmi",
+      "vcam1"
+    ],
+    "offer_id": "offer-001",
+    "parameters": {
+      "obese_bmi_threshold": 30,
+      "biomarker": "vcam1",
+      "method": "mann_whitney_u_two_sided"
+    },
+    "payer": "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
+    "quote_id": "quote-001",
+    "provider_id": "provider-a",
+    "dataset_id": "synthetic-cohort-a",
+    "dataset_version": "v1",
+    "dataset_hash": "a1d8b18f60af4400d01d1ff52e6d73dd92ad584b800c06c3ba92791b416b172a",
+    "rights_decision": {
+      "decision_id": "rights-001",
+      "request_id": "req-001",
+      "offer_id": "offer-001",
+      "policy_version": "policy-1",
+      "purpose": "academic_research",
+      "operation": "aggregate_analysis",
+      "allowed": true,
+      "code": "RIGHTS_ALLOWED",
+      "reason": "Synthetic aggregate research permitted",
+      "evaluated_at": "2026-11-14T11:00:00Z"
+    },
+    "price": {
+      "currency": "XRP",
+      "value": "3.500000"
+    },
+    "destination": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+    "network": "testnet",
+    "reference": "quote-001",
+    "terms_hash": "010783fc637947da5ab56fb33f74675f109c990507a09cc5ac6a17ee9a772f63",
+    "created_at": "2026-11-14T11:00:00Z",
+    "expires_at": "2026-11-14T12:00:00Z"
+  },
+  "PlanCreate": {
+    "request_id": "req-001"
+  },
+  "Plan": {
+    "plan_id": "plan-001",
+    "request_id": "req-001",
+    "candidate_offer_ids": [
+      "offer-001",
+      "offer-002",
+      "offer-003"
+    ],
+    "recommended_offer_id": "offer-001",
+    "reason": "Variables covered and academic use permitted",
+    "created_at": "2026-11-14T11:00:00Z"
+  },
+  "MandateCreate": {
+    "request_id": "req-001",
+    "quote_id": "quote-001",
+    "provider_allowlist": [
+      "provider-a"
+    ],
+    "per_purchase_limit": {
+      "currency": "XRP",
+      "value": "5"
+    },
+    "total_limit": {
+      "currency": "XRP",
+      "value": "10"
+    },
+    "max_network_fee_drops": "100",
+    "expires_at": "2026-11-14T12:00:00Z"
+  },
+  "Mandate": {
+    "request_id": "req-001",
+    "quote_id": "quote-001",
+    "provider_allowlist": [
+      "provider-a"
+    ],
+    "per_purchase_limit": {
+      "currency": "XRP",
+      "value": "5"
+    },
+    "total_limit": {
+      "currency": "XRP",
+      "value": "10"
+    },
+    "max_network_fee_drops": "100",
+    "expires_at": "2026-11-14T12:00:00Z",
+    "mandate_id": "mandate-001",
+    "approved_by": "human-001",
+    "approved_at": "2026-11-14T11:00:00Z",
+    "status": "APPROVED"
+  },
+  "PaymentReference": {
+    "network": "testnet",
+    "xrpl_tx_hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+  },
+  "JobCreate": {
+    "job_id": "job-001",
+    "request_id": "req-001",
+    "quote_id": "quote-001",
+    "offer_id": "offer-001",
+    "purpose": "academic_research",
+    "operation": "aggregate_analysis",
+    "parameters": {
+      "obese_bmi_threshold": 30,
+      "biomarker": "vcam1",
+      "method": "mann_whitney_u_two_sided"
+    },
+    "payment_reference": {
+      "network": "testnet",
+      "xrpl_tx_hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    }
+  },
+  "Job": {
+    "job_id": "job-001",
+    "request_id": "req-001",
+    "quote_id": "quote-001",
+    "status": "RECEIVED",
+    "created_at": "2026-11-14T11:00:00Z",
+    "updated_at": "2026-11-14T11:00:00Z"
+  },
+  "Error": {
+    "code": "PAYMENT_UNVALIDATED",
+    "message": "Ledger finality not established",
+    "correlation_id": "corr-001",
+    "retryable": true
+  },
+  "AnalysisResult": {
+    "biomarker": "vcam1",
+    "units": "ng/mL",
+    "groups": [
+      {
+        "group": "non_obese",
+        "n": 2,
+        "median": 15,
+        "q1": 12.5,
+        "q3": 17.5
+      },
+      {
+        "group": "obese",
+        "n": 2,
+        "median": 35,
+        "q1": 32.5,
+        "q3": 37.5
+      }
+    ],
+    "method": "mann_whitney_u_two_sided",
+    "statistic": 0,
+    "p_value": 0.3333333333333333,
+    "excluded_rows": 0
+  },
+  "PaymentEvidence": {
+    "payment_reference": {
+      "network": "testnet",
+      "xrpl_tx_hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    "ledger_index": 12345,
+    "validated_at": "2026-11-14T11:00:00Z",
+    "transaction_result": "tesSUCCESS",
+    "payer": "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
+    "destination": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+    "delivered_amount": {
+      "currency": "XRP",
+      "value": "3.500000"
+    },
+    "reference": "quote-001"
+  },
+  "Provenance": {
+    "request_id": "req-001",
+    "quote_id": "quote-001",
+    "offer_id": "offer-001",
+    "provider_id": "provider-a",
+    "dataset_id": "synthetic-cohort-a",
+    "dataset_version": "v1",
+    "dataset_hash": "a1d8b18f60af4400d01d1ff52e6d73dd92ad584b800c06c3ba92791b416b172a",
+    "code_version": "fixture-v1",
+    "code_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "output_hash": "769e1cc4406e82077d2749755db3f21868854c0a33a30d5e3da5042ae18dc3ce",
+    "terms_hash": "010783fc637947da5ab56fb33f74675f109c990507a09cc5ac6a17ee9a772f63",
+    "purpose": "academic_research",
+    "operation": "aggregate_analysis",
+    "parameters": {
+      "obese_bmi_threshold": 30,
+      "biomarker": "vcam1",
+      "method": "mann_whitney_u_two_sided"
+    },
+    "rights_decision": {
+      "decision_id": "rights-001",
+      "request_id": "req-001",
+      "offer_id": "offer-001",
+      "policy_version": "policy-1",
+      "purpose": "academic_research",
+      "operation": "aggregate_analysis",
+      "allowed": true,
+      "code": "RIGHTS_ALLOWED",
+      "reason": "Synthetic aggregate research permitted",
+      "evaluated_at": "2026-11-14T11:00:00Z"
+    },
+    "payment": {
+      "payment_reference": {
+        "network": "testnet",
+        "xrpl_tx_hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      },
+      "ledger_index": 12345,
+      "validated_at": "2026-11-14T11:00:00Z",
+      "transaction_result": "tesSUCCESS",
+      "payer": "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
+      "destination": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+      "delivered_amount": {
+        "currency": "XRP",
+        "value": "3.500000"
+      },
+      "reference": "quote-001"
+    },
+    "started_at": "2026-11-14T11:00:00Z",
+    "completed_at": "2026-11-14T11:01:00Z"
+  },
+  "Result": {
+    "job_id": "job-001",
+    "synthetic": true,
+    "network": "testnet",
+    "disclaimer": "SYNTHETIC DATA / TESTNET — not medically actionable",
+    "analysis": {
+      "biomarker": "vcam1",
+      "units": "ng/mL",
+      "groups": [
+        {
+          "group": "non_obese",
+          "n": 2,
+          "median": 15,
+          "q1": 12.5,
+          "q3": 17.5
+        },
+        {
+          "group": "obese",
+          "n": 2,
+          "median": 35,
+          "q1": 32.5,
+          "q3": 37.5
+        }
+      ],
+      "method": "mann_whitney_u_two_sided",
+      "statistic": 0,
+      "p_value": 0.3333333333333333,
+      "excluded_rows": 0
+    },
+    "provenance": {
+      "request_id": "req-001",
+      "quote_id": "quote-001",
+      "offer_id": "offer-001",
+      "provider_id": "provider-a",
+      "dataset_id": "synthetic-cohort-a",
+      "dataset_version": "v1",
+      "dataset_hash": "a1d8b18f60af4400d01d1ff52e6d73dd92ad584b800c06c3ba92791b416b172a",
+      "code_version": "fixture-v1",
+      "code_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "output_hash": "769e1cc4406e82077d2749755db3f21868854c0a33a30d5e3da5042ae18dc3ce",
+      "terms_hash": "010783fc637947da5ab56fb33f74675f109c990507a09cc5ac6a17ee9a772f63",
+      "purpose": "academic_research",
+      "operation": "aggregate_analysis",
+      "parameters": {
+        "obese_bmi_threshold": 30,
+        "biomarker": "vcam1",
+        "method": "mann_whitney_u_two_sided"
+      },
+      "rights_decision": {
+        "decision_id": "rights-001",
+        "request_id": "req-001",
+        "offer_id": "offer-001",
+        "policy_version": "policy-1",
+        "purpose": "academic_research",
+        "operation": "aggregate_analysis",
+        "allowed": true,
+        "code": "RIGHTS_ALLOWED",
+        "reason": "Synthetic aggregate research permitted",
+        "evaluated_at": "2026-11-14T11:00:00Z"
+      },
+      "payment": {
+        "payment_reference": {
+          "network": "testnet",
+          "xrpl_tx_hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        },
+        "ledger_index": 12345,
+        "validated_at": "2026-11-14T11:00:00Z",
+        "transaction_result": "tesSUCCESS",
+        "payer": "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
+        "destination": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+        "delivered_amount": {
+          "currency": "XRP",
+          "value": "3.500000"
+        },
+        "reference": "quote-001"
+      },
+      "started_at": "2026-11-14T11:00:00Z",
+      "completed_at": "2026-11-14T11:01:00Z"
+    }
+  }
+}

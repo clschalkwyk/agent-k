@@ -14,7 +14,7 @@
 ### Stage 0 — first 2 hours (together)
 - Agree question, 3 synthetic offerings, one allowed and one denied licence, one analysis.
 - Pin XRPL network, funded Testnet wallets, and confirmed payment asset.
-- Freeze `docs/API-CONTRACT.md` and sample fixtures; create OpenAPI spec before implementation diverges.
+- Review and freeze `contracts/openapi.yaml`, `docs/API-CONTRACT.md` and `contracts/fixtures/` before implementation diverges. Run `python -m pytest -q tests/contracts/test_schema.py`; each owner connects the safety adapter suite described in `contracts/README.md`.
 - Assign branch ownership: `feat/procurement` (A), `feat/fulfilment` (B). PR into main; small, frequent merges.
 
 ### Stage 1 — hours 2–12 (parallel)

@@ -31,7 +31,9 @@ Agent K turns a research objective and a delegated budget into a traceable workf
 
 - [Architecture and bounded contexts](docs/ARCHITECTURE.md)
 - [Execution strategy and two-developer milestones](docs/EXECUTION.md)
-- [HTTP contract and state transitions](docs/API-CONTRACT.md)
+- [OpenAPI 3.1 contract](contracts/openapi.yaml)
+- [Contract fixtures and independent test suites](contracts/README.md)
+- [HTTP runtime rules and state transitions](docs/API-CONTRACT.md)
 - [Demo script and acceptance checklist](docs/DEMO.md)
 - [Engineering decisions](docs/DECISIONS.md)
 
