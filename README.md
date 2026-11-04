@@ -29,6 +29,8 @@ Agent K turns a research objective and a delegated budget into a traceable workf
 
 ## Planning and execution
 
+- [DDD context map — ownership and cross-team interfaces](docs/DDD-CONTEXT-MAP.md)
+- [Execution sequence — payment, authorisation, failures and recovery](docs/EXECUTION-SEQUENCE.md)
 - [Architecture and bounded contexts](docs/ARCHITECTURE.md)
 - [Execution strategy and two-developer milestones](docs/EXECUTION.md)
 - [OpenAPI 3.1 contract](contracts/openapi.yaml)
