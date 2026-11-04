@@ -6,7 +6,7 @@
 
 ## 1. Bounded contexts and integration topology
 
-\`\`\`mermaid
+```mermaid
 flowchart LR
   USER(["Researcher"])
 
@@ -69,7 +69,7 @@ flowchart LR
   class AAPI,PLAN,ORCH,MANDATE,APORT,ADB,UI a
   class BAPI,CAT,RIGHTS,QUOTE,JOB,VERIFY,EXEC,PROV,BDB,DATA b
   class XRPL ext
-\`\`\`
+```
 
 > **Boundary rule:** all cross-domain communication goes through B's versioned Fulfilment API. The XRPL ledger is not a third bounded context, not a message bus and not a shared service database. Both developers independently integrate with it.
 
@@ -77,12 +77,12 @@ flowchart LR
 
 | Procurement (A) | Fulfilment (B) | Contract translation |
 |---|---|---|
-| \`ResearchRequest\` | \`Offering\` / coverage | A converts goal/variables to catalogue filters and an evaluated offer |
-| \`ProcurementPlan\` | \`RightsDecision\` | B evaluates declared rights; A may rank only eligible offerings |
-| \`SpendingMandate\` | \`Quote\` | A approves *buying*; B declares *price, terms and provider eligibility* |
-| \`PaymentInstruction\` / \`PaymentReference\` | \`PaymentEvidence\` | A sends only lookup reference; B independently reads XRPL and derives evidence |
-| \`ResearchMission\` (orchestrated state) | \`Job\` (execution state) | Correlate via \`request_id\`, \`quote_id\`, \`job_id\` |
-| Dashboard projection | \`Result\` / \`Provenance\` | B produces evidence; A presents it |
+| `ResearchRequest` | `Offering` / coverage | A converts goal/variables to catalogue filters and an evaluated offer |
+| `ProcurementPlan` | `RightsDecision` | B evaluates declared rights; A may rank only eligible offerings |
+| `SpendingMandate` | `Quote` | A approves *buying*; B declares *price, terms and provider eligibility* |
+| `PaymentInstruction` / `PaymentReference` | `PaymentEvidence` | A sends only lookup reference; B independently reads XRPL and derives evidence |
+| `ResearchMission` (orchestrated state) | `Job` (execution state) | Correlate via `request_id`, `quote_id`, `job_id` |
+| Dashboard projection | `Result` / `Provenance` | B produces evidence; A presents it |
 
 There is **no shared aggregate named Job** across the two domains. A owns its own mission state; B owns its own processing job. Each context may use its own persistence and internal models.
 
@@ -92,26 +92,26 @@ All operations below terminate at **B's single external service boundary**; subc
 
 | ID | Caller → implementer | Interconnect | API / data contract |
 |---|---|---|---|
-| C1 | Researcher → A | HTTPS/JSON | \`POST /v1/research-requests\`, \`POST /v1/plans\`, \`POST /v1/mandates\` |
-| C2 | A → B | HTTP GET | \`GET /v1/offerings\` → \`OfferingList\` |
-| C3 | A → B | HTTP POST | \`POST /v1/rights/evaluate\` → \`RightsDecision\` (\`allowed\` true/false) |
-| C4 | A → B | HTTP POST | \`POST /v1/quotes\` → immutable \`Quote\`, including price, network, payer, destination, reference and terms hash |
-| C5 | A → XRPL | signed transaction over RPC | XRP or properly configured issued-token \`Payment\`; A stores signed TX/hash before submit |
-| C6 | A → B | HTTP POST | \`POST /v1/jobs\` with \`JobCreate\` and \`payment_reference\`; HTTP 202 means intake only |
+| C1 | Researcher → A | HTTPS/JSON | `POST /v1/research-requests`, `POST /v1/plans`, `POST /v1/mandates` |
+| C2 | A → B | HTTP GET | `GET /v1/offerings` → `OfferingList` |
+| C3 | A → B | HTTP POST | `POST /v1/rights/evaluate` → `RightsDecision` (`allowed` true/false) |
+| C4 | A → B | HTTP POST | `POST /v1/quotes` → immutable `Quote`, including price, network, payer, destination, reference and terms hash |
+| C5 | A → XRPL | signed transaction over RPC | XRP or properly configured issued-token `Payment`; A stores signed TX/hash before submit |
+| C6 | A → B | HTTP POST | `POST /v1/jobs` with `JobCreate` and `payment_reference`; HTTP 202 means intake only |
 | C7 | B → XRPL | **read-only** RPC | Fetch independent validated transaction + metadata; verify quote binding and delivered amount |
 | C8 | B Job → B Executor | internal function or worker command | Approved execution specification and immutable dataset/code identity, **not public API** |
-| C9 | A → B | HTTP GET | \`GET /v1/jobs/{job_id}\` and \`GET /v1/jobs/{job_id}/result\` → \`Job\`, \`Result\` |
+| C9 | A → B | HTTP GET | `GET /v1/jobs/{job_id}` and `GET /v1/jobs/{job_id}/result` → `Job`, `Result` |
 | C10 | A → Researcher | HTTPS/JSON | UI projection of state, result and proofs; no direct B database access |
 
-**OpenAPI is normative for payload shapes and response codes**: [\`contracts/openapi.yaml\`](../contracts/openapi.yaml). The table above is an ownership index, not a competing API definition. All POSTs carry \`Idempotency-Key\`; authenticated object access and correlation handling follow [API-CONTRACT.md](API-CONTRACT.md).
+**OpenAPI is normative for payload shapes and response codes**: [`contracts/openapi.yaml`](../contracts/openapi.yaml). The table above is an ownership index, not a competing API definition. All POSTs carry `Idempotency-Key`; authenticated object access and correlation handling follow [API-CONTRACT.md](API-CONTRACT.md).
 
 ## 3. Cross-context invariants
 
 1. **Quote is the commercial boundary.** B alone issues an immutable, quote-bound offer. A never supplies its own price, service policy, or payment destination.
 2. **Mandate != data licence.** A can approve spending only. B evaluates whether the requested use/operation is permitted and rechecks at admission/execution.
-3. **Payment is out-of-band ledger infrastructure.** A signs/submits; B independently verifies using its own pinned Testnet RPC, never accepting \`paid: true\` or A's RPC response.
+3. **Payment is out-of-band ledger infrastructure.** A signs/submits; B independently verifies using its own pinned Testnet RPC, never accepting `paid: true` or A's RPC response.
 4. **Quote ↔ transaction binding.** Follow the existing [memo binding convention](API-CONTRACT.md#quote-binding-and-expiry), exact currency/issuer and delivered amount; no raw patient/research content on XRPL.
-5. **No double purchase or double execution.** A persists signed transaction identity and reservations; B atomically binds \`quote_id\` + \`job_id\` + \`xrpl_tx_hash\` with replay protection.
+5. **No double purchase or double execution.** A persists signed transaction identity and reservations; B atomically binds `quote_id` + `job_id` + `xrpl_tx_hash` with replay protection.
 6. **Execution authority is local to B.** B denies unpaid, out-of-policy, expired or mismatched jobs. A cannot bypass B by invoking the processor directly.
 7. **No atomic payment-for-service guarantee.** Processing failures after payment require explicit exception handling; the demo does not implement generic trustless escrow or automatic refunds.
 
