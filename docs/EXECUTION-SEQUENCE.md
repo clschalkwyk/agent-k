@@ -5,7 +5,7 @@
 
 ## 1. Exact workflow across the two bounded contexts
 
-\`\`\`mermaid
+```mermaid
 sequenceDiagram
     autonumber
     actor U as Researcher
@@ -96,27 +96,27 @@ sequenceDiagram
             A-->>U: Payment failed; no job submitted
         end
     end
-\`\`\`
+```
 
-**Diagram notes:** The \`B cannot reach RPC\`, \`mismatch/replay\`, and \`processor fails\` branches represent different outcomes of validation/execution, not concurrent events. In implementation the processor failure branch occurs *after* successful verification and entry to \`RUNNING\`. The canonical status values and API response codes are from OpenAPI, not invented by the diagram.
+**Diagram notes:** The `B cannot reach RPC`, `mismatch/replay`, and `processor fails` branches represent different outcomes of validation/execution, not concurrent events. In implementation the processor failure branch occurs *after* successful verification and entry to `RUNNING`. The canonical status values and API response codes are from OpenAPI, not invented by the diagram.
 
-The diagram uses a single logical \`Dev A: Procurement\` participant for the UI/API/orchestrator and one \`Dev B: Fulfilment API\` participant for B's internal application actions. The detailed subcomponent ownership is in the context map.
+The diagram uses a single logical `Dev A: Procurement` participant for the UI/API/orchestrator and one `Dev B: Fulfilment API` participant for B's internal application actions. The detailed subcomponent ownership is in the context map.
 
 ## 2. State model — owned independently
 
 | Milestone | A: ResearchStatus | B: Job.status | Ownership / meaning |
 |---|---|---|---|
-| User submits objective | \`DRAFT\` | — | A stores request |
-| Matching and permission evaluation completed | \`PLANNED\` | — | A stores plan; B supplies decisions |
-| Human approves quote-specific mandate | \`APPROVED\` | — | A controls spend |
-| Signed payment pending validation | \`PAYMENT_PENDING\` | — | A never blindly resubmits |
-| Ledger settlement verified by A | \`PAYMENT_VALIDATED\` | — | Still not proof of B acceptance |
-| A submits job | \`PROCESSING\` (or projected pending fulfilment) | \`RECEIVED\` → \`VERIFYING\` | B's 202 only confirms intake |
-| B independently authorises | \`PROCESSING\` | \`AUTHORIZED\` → \`RUNNING\` | B enforces rights, price, payment |
-| B returns output and provenance | \`COMPLETED\` | \`COMPLETED\` | A presents B's result |
-| Rejected or failed | \`REJECTED\` / \`PAYMENT_FAILED\` / \`PROCESSING_FAILED\` / \`EXPIRED\` | \`REJECTED\` / \`FAILED\` | Distinct lifecycle failure states |
+| User submits objective | `DRAFT` | — | A stores request |
+| Matching and permission evaluation completed | `PLANNED` | — | A stores plan; B supplies decisions |
+| Human approves quote-specific mandate | `APPROVED` | — | A controls spend |
+| Signed payment pending validation | `PAYMENT_PENDING` | — | A never blindly resubmits |
+| Ledger settlement verified by A | `PAYMENT_VALIDATED` | — | Still not proof of B acceptance |
+| A submits job | `PROCESSING` (or projected pending fulfilment) | `RECEIVED` → `VERIFYING` | B's 202 only confirms intake |
+| B independently authorises | `PROCESSING` | `AUTHORIZED` → `RUNNING` | B enforces rights, price, payment |
+| B returns output and provenance | `COMPLETED` | `COMPLETED` | A presents B's result |
+| Rejected or failed | `REJECTED` / `PAYMENT_FAILED` / `PROCESSING_FAILED` / `EXPIRED` | `REJECTED` / `FAILED` | Distinct lifecycle failure states |
 
-Use the exact status enum in \`contracts/openapi.yaml\`. \`PROCESSING\` on A is an application-level projection of fulfilment, **not** B's execution state.
+Use the exact status enum in `contracts/openapi.yaml`. `PROCESSING` on A is an application-level projection of fulfilment, **not** B's execution state.
 
 ## 3. Failure-recovery contract (must survive a restart)
 
@@ -124,25 +124,25 @@ Use the exact status enum in \`contracts/openapi.yaml\`. \`PROCESSING\` on A is 
 |---|---|---|
 | Policy denied or mandate exceeds budget | Do not sign; explain reason | A + B policy |
 | HTTP timeout after payment submission | Persisted signed TX/hash is reconciled against XRPL; never sign another without proven non-inclusion/failure | A |
-| A crashes after ledger payment, before \`POST /v1/jobs\` | Rebuild from durable state; send **same** \`job_id\`, \`quote_id\`, payment reference and idempotency key | A |
-| \`POST /v1/jobs\` response lost | Retry same payload and ID. B must return original accepted response, not run twice | A + B |
-| B's XRPL RPC unavailable | Keep \`VERIFYING\`; retry lookup. No job execution until verified | B |
+| A crashes after ledger payment, before `POST /v1/jobs` | Rebuild from durable state; send **same** `job_id`, `quote_id`, payment reference and idempotency key | A |
+| `POST /v1/jobs` response lost | Retry same payload and ID. B must return original accepted response, not run twice | A + B |
+| B's XRPL RPC unavailable | Keep `VERIFYING`; retry lookup. No job execution until verified | B |
 | Fake/unvalidated/wrong-issuer/wrong-destination/partial payment | Reject with machine-readable error; no processing | B |
-| One TX presented for a second job or quote | Atomic uniqueness check → \`PAYMENT_REPLAY\` or \`JOB_ALREADY_EXISTS\` | B |
+| One TX presented for a second job or quote | Atomic uniqueness check → `PAYMENT_REPLAY` or `JOB_ALREADY_EXISTS` | B |
 | Rights revoked after quote/payment | Reject execution and show exception to human; no automatic refund claim | B + A display |
-| Processing fails after a valid payment | Mark \`FAILED\`; preserve payment claim and evidence; operator reconciliation required | B, surfaced by A |
+| Processing fails after a valid payment | Mark `FAILED`; preserve payment claim and evidence; operator reconciliation required | B, surfaced by A |
 
 **Invariant:** Money may have moved even when execution fails. This is a **trusted saga with explicit exception handling**, not atomic delivery-versus-payment.
 
 ## 4. Contract-level checkpoints for both developers
 
-- HTTP POST requests use \`Idempotency-Key\` and authenticated principals. Correlate with \`request_id\`, \`quote_id\`, \`job_id\` and \`xrpl_tx_hash\`.
+- HTTP POST requests use `Idempotency-Key` and authenticated principals. Correlate with `request_id`, `quote_id`, `job_id` and `xrpl_tx_hash`.
 - A validates the immutable quote and mandate immediately before signing; B independently checks the same immutable quote against ledger facts.
-- In the frozen API, the reference is \`payment_reference: {network, xrpl_tx_hash}\`, **not** \`paid: true\` or a duplicate \`xrpl_tx_hash\` at top level.
+- In the frozen API, the reference is `payment_reference: {network, xrpl_tx_hash}`, **not** `paid: true` or a duplicate `xrpl_tx_hash` at top level.
 - B's quote reference is bound to a single XRPL payment memo per [API-CONTRACT.md](API-CONTRACT.md#quote-binding-and-expiry); no destination-tag fallback in v0.1.
-- B must validate actual \`delivered_amount\` and the exact asset identity. Testnet XRP-only demo is sufficient while RLUSD issuer/trustline configuration is unresolved.
-- \`POST /v1/jobs\` 202 means \`RECEIVED\`, never \`AUTHORIZED\`; A polls \`GET /v1/jobs/{job_id}\` until completion/rejection/failure.
-- A may query \`GET /v1/jobs/{job_id}/result\` only once B reports \`COMPLETED\`; the result includes reproducibility hashes and verified ledger evidence.
+- B must validate actual `delivered_amount` and the exact asset identity. Testnet XRP-only demo is sufficient while RLUSD issuer/trustline configuration is unresolved.
+- `POST /v1/jobs` 202 means `RECEIVED`, never `AUTHORIZED`; A polls `GET /v1/jobs/{job_id}` until completion/rejection/failure.
+- A may query `GET /v1/jobs/{job_id}/result` only once B reports `COMPLETED`; the result includes reproducibility hashes and verified ledger evidence.
 - There is **no onchain patient data**, no production medical rights attestation and no third-party scientific execution proof in this MVP.
 
 ## 5. Minimum joint sign-off
